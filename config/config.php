@@ -7,7 +7,7 @@ date_default_timezone_set('Asia/Makassar');
  * Contoh Base URL: 'http://localhost/project-name/'
  * Pastikan untuk mengganti URL pada file .htaccess agar sesuai dengan Base URL yang sama.
  */
-define('BASE_URL', 'http://my-public-project.infinityfreeapp.com/expert-system/');
+define('BASE_URL', 'http://localhost/expert-system/');
 
 // Menentukan environment: development atau production
 define('ENVIRONMENT', 'development');
