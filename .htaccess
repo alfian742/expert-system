@@ -19,4 +19,4 @@ RewriteRule ^(user|auth|dashboard)/layout/ - [F,L]
 # Mengalihkan ke halaman 403 jika ada akses yang dilarang
 # Contoh Base URL: 'http://localhost/project-name/'
 # Pastikan untuk mengganti URL pada file config/config.php agar sesuai dengan Base URL yang sama.
-ErrorDocument 403 http://my-public-project.infinityfreeapp.com/expert-system/error/403.php
+ErrorDocument 403 http://localhost/expert-system/error/403.php
