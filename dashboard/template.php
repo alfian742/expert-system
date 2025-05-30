@@ -140,37 +140,93 @@
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            function fetchNotifications() {
-                fetch('<?= base_url('dashboard/notification/get-notification-count.php'); ?>')
-                    .then(response => response.json())
-                    .then(data => {
-                        const notification = document.querySelector(".notification");
+        let pollingInterval;
+        let isPollingActive = false;
+        let idleTime = 0;
+        const idleLimit = 300; // 5 menit
 
-                        if (data.result_count > 0) {
-                            // Menampilkan span dengan mengganti kelas dari d-none ke d-flex
-                            notification.classList.remove("d-none");
-                            notification.classList.add("d-flex");
+        function fetchNotifications() {
+            if (document.hidden) return; // Jangan fetch kalau tab tidak aktif
 
-                            if (data.result_count > 99) {
-                                notification.textContent = "99+";
-                            } else {
-                                notification.textContent = data.result_count;
-                            }
+            fetch('<?= base_url('dashboard/notification/get-notification-count.php'); ?>')
+                .then(response => response.json())
+                .then(data => {
+                    const notification = document.querySelector(".notification");
+
+                    if (data.result_count > 0) {
+                        notification.classList.remove("d-none");
+                        notification.classList.add("d-flex");
+
+                        if (data.result_count > 99) {
+                            notification.textContent = "99+";
                         } else {
-                            // Menyembunyikan span jika result_count 0 atau tidak ada notifikasi
-                            notification.classList.remove("d-flex");
-                            notification.classList.add("d-none");
+                            notification.textContent = data.result_count;
                         }
-                    })
-                    .catch(error => console.error("Fetch error:", error));
+                    } else {
+                        notification.classList.remove("d-flex");
+                        notification.classList.add("d-none");
+                    }
+                })
+                .catch(error => console.error("Fetch error:", error));
+        }
+
+        function startPolling() {
+            if (!isPollingActive) {
+                pollingInterval = setInterval(fetchNotifications, 60000); // 60 detik
+                isPollingActive = true;
             }
+        }
 
-            // Jalankan pertama kali
-            fetchNotifications();
+        function stopPolling() {
+            if (isPollingActive) {
+                clearInterval(pollingInterval);
+                isPollingActive = false;
+            }
+        }
 
-            // Update setiap 10 detik
-            setInterval(fetchNotifications, 10000);
+        function resetIdleTimer() {
+            idleTime = 0;
+            if (!isPollingActive) {
+                startPolling();
+            }
+        }
+
+        function checkIdleStatus() {
+            idleTime++;
+            if (idleTime >= idleLimit) {
+                stopPolling();
+            }
+        }
+
+        function debounce(func, delay) {
+            let timer;
+            return function() {
+                clearTimeout(timer);
+                timer = setTimeout(func, delay);
+            };
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchNotifications(); // langsung jalankan di awal
+            startPolling(); // mulai polling
+
+            // Cek idle tiap 5 detik (hemat resource)
+            setInterval(checkIdleStatus, 5000);
+
+            // Reset idle saat ada interaksi
+            document.addEventListener("mousemove", debounce(resetIdleTimer, 500));
+            document.addEventListener("keydown", debounce(resetIdleTimer, 500));
+            document.addEventListener("scroll", debounce(resetIdleTimer, 500));
+            document.addEventListener("click", debounce(resetIdleTimer, 500));
+
+            // Hentikan polling kalau tab tidak aktif
+            document.addEventListener("visibilitychange", function() {
+                if (document.hidden) {
+                    stopPolling();
+                } else {
+                    resetIdleTimer();
+                }
+            });
         });
     </script>
 
