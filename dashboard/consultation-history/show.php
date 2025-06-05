@@ -51,20 +51,24 @@ $page_name = 'Riwayat Konsultasi';
                                 <?php
                                 // Query utama sudah dioptimalkan untuk mengambil penyakit utama sekaligus
                                 $query_consultation = "SELECT consultations.id AS consultation_id, 
-                                          consultations.consultation_date, 
-                                          users.fullname, 
-                                          users.email, 
-                                          users.role, 
-                                          diseases.disease_name, 
-                                          histories.accuracy
-                                   FROM consultations
-                                   INNER JOIN histories ON histories.consultation_id = consultations.id
-                                   INNER JOIN users ON users.id = histories.user_id
-                                   INNER JOIN diseases ON diseases.id = histories.disease_id
-                                   WHERE histories.accuracy = (SELECT MAX(h.accuracy) 
-                                                               FROM histories h 
-                                                               WHERE h.consultation_id = consultations.id)
-                                   ORDER BY consultations.consultation_date DESC";
+                                                            consultations.consultation_date, 
+                                                            users.fullname, 
+                                                            users.email, 
+                                                            users.role, 
+                                                            diseases.disease_name, 
+                                                            histories.accuracy
+                                                        FROM consultations
+                                                        INNER JOIN histories ON histories.consultation_id = consultations.id
+                                                        INNER JOIN users ON users.id = histories.user_id
+                                                        INNER JOIN diseases ON diseases.id = histories.disease_id
+                                                        WHERE histories.id = (
+                                                            SELECT h.id
+                                                            FROM histories h
+                                                            WHERE h.consultation_id = consultations.id
+                                                            ORDER BY h.accuracy DESC, h.id ASC
+                                                            LIMIT 1
+                                                        )
+                                                        ORDER BY consultations.consultation_date DESC";
 
                                 $result_consultation = $connection->query($query_consultation);
 

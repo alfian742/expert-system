@@ -43,7 +43,7 @@
                 <!-- Notification -->
                 <a class="btn border-0 py-1 px-2 position-relative me-1" href="<?= base_url('dashboard/notification/show.php'); ?>">
                     <i class="bi bi-bell-fill fs-4"></i>
-                    <span class="notification bg-warning text-white position-absolute rounded top-0 end-0 d-flex justify-content-center align-items-center" style="width: 1.25rem; height: 1.25rem; font-size: .75rem;"></span>
+                    <span class="notification bg-warning text-white position-absolute rounded top-0 end-0 d-flex justify-content-center align-items-center d-none" style="width: 1.25rem; height: 1.25rem; font-size: .75rem;"></span>
                 </a>
 
                 <!-- Profile -->
